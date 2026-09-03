@@ -1,0 +1,19 @@
+[build]
+target = [
+    "riscv32imfc-unknown-none-elf"
+]
+
+[target."cfg(all())"]
+rustflags = [
+    "-Clink-arg=--nmagic",
+    "-Clink-arg=-Tlink.x",
+]
+
+[unstable]
+build-std = [
+    "core",
+    "alloc",
+]
+build-std-features = [
+    "optimize_for_size",
+]

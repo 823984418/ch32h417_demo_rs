@@ -1,0 +1,29 @@
+[package]
+name = "ch32h417_demo_rs"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "ch32h417_demo_rs"
+harness = false
+
+[profile.dev]
+debug = true
+
+[profile.release]
+debug = true
+
+[dependencies]
+
+[dependencies.riscv]
+version = "0.16.1"
+features = [
+    "rt",
+]
+
+[dependencies.riscv-rt]
+version = "0.18.0"
+features = [
+    "memory",
+]
+
