@@ -1,6 +1,6 @@
 [build]
 target = [
-    "riscv32imfc-unknown-none-elf"
+    "riscv32imafc-unknown-none-elf.json",
 ]
 
 [target."cfg(all())"]
@@ -10,9 +10,13 @@ rustflags = [
 ]
 
 [unstable]
+json-target-spec = true
+panic-immediate-abort = true
 build-std = [
     "core",
     "alloc",
+    "panic_abort",
+    "std",
 ]
 build-std-features = [
     "optimize_for_size",

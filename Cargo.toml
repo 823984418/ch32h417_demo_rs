@@ -15,10 +15,22 @@ debug = true
 
 [dependencies]
 
+[dependencies.rtt-target]
+version = "0.6.2"
+
 [dependencies.riscv]
 version = "0.16.1"
 features = [
     "rt",
+    "critical-section-single-hart",
+]
+
+[dependencies.cortex-m-std-dummy]
+version = "0.1.2"
+features = [
+    "all",
+    "linkage_weak",
+    "nightly_linkage",
 ]
 
 [dependencies.riscv-rt]
@@ -26,4 +38,3 @@ version = "0.18.0"
 features = [
     "memory",
 ]
-
