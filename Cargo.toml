@@ -26,7 +26,7 @@ features = [
 ]
 
 [dependencies.cortex-m-std-dummy]
-version = "0.1.2"
+version = "0.2.0"
 features = [
     "all",
     "linkage_weak",
