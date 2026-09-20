@@ -12,10 +12,10 @@ checksum = "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06"
 name = "ch32h417_demo_rs"
 version = "0.1.0"
 dependencies = [
- "bitflags",
  "cortex-m-std-dummy",
  "riscv",
  "riscv-rt",
+ "rpb",
  "rtt-target",
 ]
 
@@ -131,6 +131,13 @@ name = "riscv-types"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3f2ad9f15a07f4a0e1677124f9120ce7e83ab7e1ca7186af0ca9da529b62e80"
+
+[[package]]
+name = "rpb"
+version = "0.1.0"
+dependencies = [
+ "bitflags",
+]
 
 [[package]]
 name = "rtt-target"

@@ -39,8 +39,9 @@ features = [
     "memory",
 ]
 
-[dependencies.bitflags]
-version = "2.13.2"
+[dependencies.rpb]
+path = "../rpb"
+
 
 [lints.rust]
 nonstandard_style = "allow"
