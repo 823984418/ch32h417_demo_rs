@@ -38,3 +38,10 @@ version = "0.18.0"
 features = [
     "memory",
 ]
+
+[dependencies.bitflags]
+version = "2.13.2"
+
+[lints.rust]
+nonstandard_style = "allow"
+
