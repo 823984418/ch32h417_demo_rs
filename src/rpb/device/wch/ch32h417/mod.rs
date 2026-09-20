@@ -12,6 +12,7 @@ use crate::rpb::peripheral::riscv32::qingke::pfic::PFIC;
 use crate::rpb::peripheral::riscv32::qingke::systick::SysTick;
 use crate::rpb::register::Reg32;
 
+#[derive(Debug)]
 pub struct Device {
     pub PWR: Block<PWR, 0x40007000>,
 

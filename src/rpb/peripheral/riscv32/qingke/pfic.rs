@@ -2,6 +2,7 @@ use crate::rpb::register::{Reg8, Reg32};
 
 /// 可编程快速中断控制器
 /// 这是 WCH 的专用外设
+#[derive(Debug)]
 #[repr(C)]
 pub struct PFIC {
     /// 中断使能状态寄存器 x

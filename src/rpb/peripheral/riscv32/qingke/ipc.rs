@@ -2,6 +2,7 @@ use crate::rpb::register::Reg32;
 
 /// 核间通信
 /// 这是 WCH 的专用外设
+#[derive(Debug)]
 #[repr(C)]
 pub struct IPC {
     /// 控制寄存器

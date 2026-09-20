@@ -2,6 +2,7 @@ use crate::rpb::register::{Reg8, Reg32};
 
 /// 硬件信号量
 /// 这是 WCH 的专用外设
+#[derive(Debug)]
 #[repr(C)]
 pub struct HSEM {
     pub RX: [Reg32; 32],

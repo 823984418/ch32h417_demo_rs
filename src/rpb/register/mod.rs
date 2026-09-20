@@ -1,8 +1,15 @@
 use core::cell::UnsafeCell;
-use core::ops::{BitAnd, BitOr};
-use std::ops::Not;
+use core::fmt::{Debug, Formatter};
+use core::ops::{BitAnd, BitOr, Not};
 
 pub struct Reg<T: ?Sized>(UnsafeCell<T>);
+
+impl<T: Debug> Debug for Reg<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        let value = self.get();
+        Debug::fmt(&value, f)
+    }
+}
 
 impl<T> Reg<T> {
     pub fn set(&self, value: T) {

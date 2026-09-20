@@ -2,6 +2,7 @@ use bitflags::bitflags;
 
 use crate::rpb::register::{Reg, Reg32};
 
+#[derive(Debug)]
 #[repr(C)]
 pub struct RCC {
     pub CTLR: Reg<CTLR>,
@@ -21,6 +22,7 @@ pub struct RCC {
 }
 
 bitflags! {
+    #[derive(Debug, Copy, Clone)]
     pub struct CTLR: u32 {
         const CSS_HSE_DIS = 1 << 31;
         const SERDES_PLLRDY = 1 << 29;
@@ -45,6 +47,7 @@ bitflags! {
 }
 
 bitflags! {
+    #[derive(Debug, Copy, Clone)]
     pub struct CFGR0: u32 {
         const ADCSRC = 1 << 31;
         const ADC_DUTY_SEL = 1 << 30;
@@ -70,6 +73,7 @@ bitflags! {
 }
 
 bitflags! {
+    #[derive(Debug, Copy, Clone)]
     pub struct HB2PCENR: u32 {
         const I3CEN = 1 << 31;
         const LTDCEN = 1 << 30;

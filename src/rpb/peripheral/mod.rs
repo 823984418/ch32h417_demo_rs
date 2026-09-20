@@ -1,3 +1,4 @@
+use core::fmt::{Debug, Formatter};
 use core::marker::PhantomData;
 use core::ops::{Deref, DerefMut};
 
@@ -5,6 +6,12 @@ pub mod cortex_m;
 pub mod riscv32;
 
 pub struct Block<T, const ADDR: usize>(PhantomData<*mut T>);
+
+impl<T: Debug, const ADDR: usize> Debug for Block<T, ADDR> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.deref().fmt(f)
+    }
+}
 
 impl<T, const ADDR: usize> Deref for Block<T, ADDR> {
     type Target = T;
