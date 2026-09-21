@@ -18,12 +18,22 @@ debug = true
 [dependencies.rtt-target]
 version = "0.6.2"
 
+[dependencies.embedded-alloc]
+version = "0.7.0"
+default-features = false
+features = [
+    "llff",
+]
+
 [dependencies.riscv]
 version = "0.16.1"
 features = [
     "rt",
     "critical-section-single-hart",
 ]
+
+[dependencies.libc]
+version = "0.2.189"
 
 [dependencies.cortex-m-std-dummy]
 version = "0.2.0"
@@ -42,6 +52,8 @@ features = [
 [dependencies.rpb]
 path = "../rpb"
 
+[dependencies.embedded-hal]
+version = "1.0.0"
 
 [lints.rust]
 nonstandard_style = "allow"
