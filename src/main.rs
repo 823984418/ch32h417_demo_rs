@@ -21,6 +21,7 @@ use embedded_hal::delay::DelayNs;
 use libc::{STDERR_FILENO, STDOUT_FILENO, c_int, c_void, size_t, ssize_t};
 pub use rpb::device::wch::ch32h417 as device;
 use rpb::device::wch::ch32h417::gpio::{GPIO_Af, GPIO_Pin, GPIO_Pins, GPIO_Port};
+use rpb::peripheral::riscv32::qingke::csr::cache_strtg_ctlr::CACHE_STRTG_CTLR;
 use rpb::peripheral::riscv32::qingke::csr::corecfgr::CORECFGR;
 use rpb::peripheral::riscv32::qingke::csr::inestcr::INESTCR;
 use rpb::peripheral::riscv32::qingke::pfic::SCTLR;
@@ -57,7 +58,7 @@ unsafe fn main() -> ! {
                     | CORECFGR::IE_REMAP_EN
                     | CORECFGR::FETCH_MODE_1,
             );
-            DEVICE.CSR.inestcr.set(INESTCR::NEST_LVL_8);
+            DEVICE.CSR.inestcr.set(INESTCR::NEST_LVL_2);
             unsafe { allocator_init() };
             NORMAL_STARTUP.store(true, Ordering::SeqCst);
             DEVICE.PFIC.WAKEIP[1].set(0);
@@ -73,6 +74,12 @@ unsafe fn main() -> ! {
                     | CORECFGR::CSTA_FAULT_IE
                     | CORECFGR::IE_REMAP_EN
                     | CORECFGR::FETCH_MODE_0,
+            );
+            DEVICE.CSR.cache_strtg_ctlr.set(
+                CACHE_STRTG_CTLR::IC_MEM1_STRTG
+                    | CACHE_STRTG_CTLR::IC_MEM0_STRTG
+                    | CACHE_STRTG_CTLR::IC_SRAM_STRTG
+                    | CACHE_STRTG_CTLR::IC_CODE_STRTG,
             );
             DEVICE.CSR.inestcr.set(INESTCR::NEST_LVL_8);
             if !NORMAL_STARTUP.load(Ordering::SeqCst) {
@@ -139,12 +146,16 @@ fn v5f_main() -> ! {
         Mode: CFGR_PIN::PP_OUT,
     });
 
+    println!("{:#?}", DEVICE.CSR);
+
     let mut delay = delay::McycleDelay::new(400_000_000);
     loop {
         DEVICE.GPIOE.SetBits(GPIO_Pins::PIN4 | GPIO_Pins::PIN5);
-        delay.delay_ms(500);
+        // delay.delay_ms(500);
+        riscv::asm::delay(200_000_000);
 
         DEVICE.GPIOE.ResetBits(GPIO_Pins::PIN4 | GPIO_Pins::PIN5);
-        delay.delay_ms(500);
+        // delay.delay_ms(500);
+        riscv::asm::delay(200_000_000);
     }
 }
