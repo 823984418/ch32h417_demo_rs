@@ -19,8 +19,8 @@ use device::usart::{
 };
 use embedded_hal::delay::DelayNs;
 use libc::{STDERR_FILENO, STDOUT_FILENO, c_int, c_void, size_t, ssize_t};
-use riscv::register::mcycle;
 pub use rpb::device::wch::ch32h417 as device;
+use rpb::device::wch::ch32h417::gpio::{GPIO_Af, GPIO_Pin, GPIO_Pins, GPIO_Port};
 use rpb::peripheral::riscv32::qingke::pfic::SCTLR;
 
 pub const DEVICE: Device = unsafe { core::mem::zeroed() };
@@ -93,9 +93,11 @@ fn v5f_main() -> ! {
         HB2PCENR::AFIOEN | HB2PCENR::USART1EN | HB2PCENR::IOPAEN,
         true,
     );
-    DEVICE.AFIO.PinAFConfig(0, 9, 7);
+    DEVICE
+        .AFIO
+        .PinAFConfig(GPIO_Port::PA, GPIO_Pin::PIN9, GPIO_Af::AF7);
     DEVICE.GPIOA.Init(&GPIO_Init {
-        Pin: 1 << 9,
+        Pin: GPIO_Pins::PIN9,
         Speed: SPEED_PIN::SPEED_180M,
         Mode: CFGR_PIN::AF_PP_OUT,
     });
@@ -110,8 +112,12 @@ fn v5f_main() -> ! {
     DEVICE.USART1.Cmd(true);
 
     DEVICE.RCC.HB2PeriphClockCmd(HB2PCENR::IOPEEN, true);
-    DEVICE.GPIOE.CFGLR.bit_or(CFGR_PIN::PP_OUT.pin(4));
-    DEVICE.GPIOE.CFGLR.bit_or(CFGR_PIN::PP_OUT.pin(5));
+
+    DEVICE.GPIOE.Init(&GPIO_Init {
+        Pin: GPIO_Pins::PIN4 | GPIO_Pins::PIN5,
+        Speed: SPEED_PIN::SPEED_180M,
+        Mode: CFGR_PIN::PP_OUT,
+    });
 
     let mut delay = delay::McycleDelay::new(400_000_000);
     loop {
