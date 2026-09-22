@@ -24,6 +24,7 @@ use rpb::device::wch::ch32h417::gpio::{GPIO_Af, GPIO_Pin, GPIO_Pins, GPIO_Port};
 use rpb::peripheral::riscv32::qingke::csr::cache_strtg_ctlr::CACHE_STRTG_CTLR;
 use rpb::peripheral::riscv32::qingke::csr::corecfgr::CORECFGR;
 use rpb::peripheral::riscv32::qingke::csr::inestcr::INESTCR;
+use rpb::peripheral::riscv32::qingke::csr::intsyscr::INTSYSCR;
 use rpb::peripheral::riscv32::qingke::pfic::SCTLR;
 
 pub const DEVICE: Device = unsafe { core::mem::zeroed() };
@@ -58,6 +59,10 @@ unsafe fn main() -> ! {
                     | CORECFGR::IE_REMAP_EN
                     | CORECFGR::FETCH_MODE_1,
             );
+            DEVICE
+                .CSR
+                .intsyscr
+                .set(INTSYSCR::PMTCFG_1 | INTSYSCR::INESTEN | INTSYSCR::HWSTKEN);
             DEVICE.CSR.inestcr.set(INESTCR::NEST_LVL_2);
             unsafe { allocator_init() };
             NORMAL_STARTUP.store(true, Ordering::SeqCst);
