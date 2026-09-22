@@ -21,6 +21,8 @@ use embedded_hal::delay::DelayNs;
 use libc::{STDERR_FILENO, STDOUT_FILENO, c_int, c_void, size_t, ssize_t};
 pub use rpb::device::wch::ch32h417 as device;
 use rpb::device::wch::ch32h417::gpio::{GPIO_Af, GPIO_Pin, GPIO_Pins, GPIO_Port};
+use rpb::peripheral::riscv32::qingke::csr::corecfgr::CORECFGR;
+use rpb::peripheral::riscv32::qingke::csr::inestcr::INESTCR;
 use rpb::peripheral::riscv32::qingke::pfic::SCTLR;
 
 pub const DEVICE: Device = unsafe { core::mem::zeroed() };
@@ -49,6 +51,13 @@ unsafe fn allocator_init() {
 unsafe fn main() -> ! {
     match riscv::register::mhartid::read() {
         0 => {
+            DEVICE.CSR.corecfgr.set(
+                CORECFGR::from_bits_retain(0x1237 << 16)
+                    | CORECFGR::CSTA_FAULT_IE
+                    | CORECFGR::IE_REMAP_EN
+                    | CORECFGR::FETCH_MODE_1,
+            );
+            DEVICE.CSR.inestcr.set(INESTCR::NEST_LVL_8);
             unsafe { allocator_init() };
             NORMAL_STARTUP.store(true, Ordering::SeqCst);
             DEVICE.PFIC.WAKEIP[1].set(0);
@@ -56,6 +65,16 @@ unsafe fn main() -> ! {
             v3f_main();
         }
         1 => {
+            DEVICE.CSR.corecfgr.set(
+                CORECFGR::from_bits_retain(0x1237 << 16)
+                    | CORECFGR::NLP_EN
+                    | CORECFGR::GHR_EN
+                    | CORECFGR::LSU_DUAL
+                    | CORECFGR::CSTA_FAULT_IE
+                    | CORECFGR::IE_REMAP_EN
+                    | CORECFGR::FETCH_MODE_0,
+            );
+            DEVICE.CSR.inestcr.set(INESTCR::NEST_LVL_8);
             if !NORMAL_STARTUP.load(Ordering::SeqCst) {
                 DEVICE.PFIC.SystemReset();
             }
