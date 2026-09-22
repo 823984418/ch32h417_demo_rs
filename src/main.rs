@@ -73,7 +73,7 @@ unsafe fn main() -> ! {
                     | CORECFGR::LSU_DUAL
                     | CORECFGR::CSTA_FAULT_IE
                     | CORECFGR::IE_REMAP_EN
-                    | CORECFGR::FETCH_MODE_0,
+                    | CORECFGR::FETCH_MODE_1,
             );
             DEVICE.CSR.cache_strtg_ctlr.set(
                 CACHE_STRTG_CTLR::IC_MEM1_STRTG
