@@ -49,18 +49,19 @@ unsafe fn allocator_init() {
 unsafe fn main() -> ! {
     match riscv::register::mhartid::read() {
         0 => {
-            allocator_init();
+            unsafe { allocator_init() };
             NORMAL_STARTUP.store(true, Ordering::SeqCst);
             DEVICE.PFIC.WAKEIP[1].set(0);
             DEVICE.PFIC.SCTLR.bit_or(SCTLR::SETEVENT);
             v3f_main();
         }
-        _ => {
+        1 => {
             if !NORMAL_STARTUP.load(Ordering::SeqCst) {
                 DEVICE.PFIC.SystemReset();
             }
             v5f_main();
         }
+        _ => unreachable!(),
     }
 }
 
@@ -121,12 +122,10 @@ fn v5f_main() -> ! {
 
     let mut delay = delay::McycleDelay::new(400_000_000);
     loop {
-        DEVICE.GPIOE.CFGLR.bit_or(CFGR_PIN::PP_OUT.pin(4));
-        DEVICE.GPIOE.CFGLR.bit_or(CFGR_PIN::PP_OUT.pin(5));
+        DEVICE.GPIOE.SetBits(GPIO_Pins::PIN4 | GPIO_Pins::PIN5);
         delay.delay_ms(500);
 
-        DEVICE.GPIOE.CFGLR.bit_clear(CFGR_PIN::PP_OUT.pin(4));
-        DEVICE.GPIOE.CFGLR.bit_clear(CFGR_PIN::PP_OUT.pin(5));
+        DEVICE.GPIOE.ResetBits(GPIO_Pins::PIN4 | GPIO_Pins::PIN5);
         delay.delay_ms(500);
     }
 }
