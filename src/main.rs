@@ -166,3 +166,38 @@ fn v5f_main() -> ! {
         riscv::asm::delay(200_000_000);
     }
 }
+
+pub const fn wch_interrupt_fast<F: Fn() + Copy + 'static>(f: F) -> extern "C" fn() {
+    let _ = f;
+
+    /// Monomorphized trampoline: reconstitutes the zero-sized closure and runs it.
+    extern "C" fn wch_interrupt_fast_trap_inner<F: Fn() + Copy + 'static>() {
+        const { assert!(size_of::<F>() == 0) };
+        // SAFETY: `F` is asserted to be a ZST (its only inhabitant has zero bytes),
+        // so an all-zero bit pattern is a valid `F`.
+        let f: F = unsafe { core::mem::zeroed() };
+        f();
+    }
+
+    #[unsafe(naked)]
+    extern "C" fn wch_interrupt_fast_trap<F: Fn() + Copy + 'static>() {
+        core::arch::naked_asm!(
+            // Reserve a 16-byte aligned frame and save `ra` so that `call`
+            // (which clobbers `ra`) does not destroy the interrupted context.
+            "addi sp, sp, -16",
+            "sw   ra, 0(sp)",
+
+            // Invoke the monomorphized Rust wrapper, which constructs the ZST
+            // closure `F` and calls it.
+            "call {inner}",
+
+            // Restore `ra` and the stack, then return from the trap.
+            "lw   ra, 0(sp)",
+            "addi sp, sp, 16",
+            "mret",
+            inner = sym wch_interrupt_fast_trap_inner::<F>,
+        );
+    }
+
+    wch_interrupt_fast_trap::<F>
+}
