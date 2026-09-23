@@ -17,7 +17,6 @@ use device::usart::{
     STATR, USART_HardwareFlowControl, USART_Init, USART_Mode, USART_Parity, USART_StopBits,
     USART_WordLength,
 };
-use embedded_hal::delay::DelayNs;
 use libc::{STDERR_FILENO, STDOUT_FILENO, c_int, c_void, size_t, ssize_t};
 pub use rpb::device::wch::ch32h417 as device;
 use rpb::device::wch::ch32h417::gpio::{GPIO_Af, GPIO_Pin, GPIO_Pins, GPIO_Port};
@@ -121,8 +120,10 @@ fn v5f_main() -> ! {
     DEVICE.RCC.DeInit();
     DEVICE.SetSYSCLK_400M_CoreCLK_V5F_400M_V3F_100M_HSE();
 
+    let clocks = DEVICE.RCC.GetClocksFreq();
+
     DEVICE.RCC.HB2PeriphClockCmd(
-        HB2PCENR::AFIOEN | HB2PCENR::USART1EN | HB2PCENR::IOPAEN,
+        HB2PCENR::AFIOEN | HB2PCENR::USART1EN | HB2PCENR::IOPAEN | HB2PCENR::IOPEEN,
         true,
     );
     DEVICE
@@ -133,17 +134,18 @@ fn v5f_main() -> ! {
         Speed: SPEED_PIN::SPEED_180M,
         Mode: CFGR_PIN::AF_PP_OUT,
     });
-    DEVICE.USART1.Init(&USART_Init {
-        BaudRate: 9600,
-        WordLength: USART_WordLength::WordLength_8b,
-        StopBits: USART_StopBits::StopBits_1,
-        Parity: USART_Parity::Parity_No,
-        Mode: USART_Mode::Mode_Tx,
-        HardwareFlowControl: USART_HardwareFlowControl::empty(),
-    });
+    DEVICE.USART1.Init(
+        &USART_Init {
+            BaudRate: 9600,
+            WordLength: USART_WordLength::WordLength_8b,
+            StopBits: USART_StopBits::StopBits_1,
+            Parity: USART_Parity::Parity_No,
+            Mode: USART_Mode::Mode_Tx,
+            HardwareFlowControl: USART_HardwareFlowControl::empty(),
+        },
+        clocks.HCLK,
+    );
     DEVICE.USART1.Cmd(true);
-
-    DEVICE.RCC.HB2PeriphClockCmd(HB2PCENR::IOPEEN, true);
 
     DEVICE.GPIOE.Init(&GPIO_Init {
         Pin: GPIO_Pins::PIN4 | GPIO_Pins::PIN5,
