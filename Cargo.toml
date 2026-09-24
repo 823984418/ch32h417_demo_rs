@@ -28,7 +28,6 @@ features = [
 [dependencies.riscv]
 version = "0.16.1"
 features = [
-    "rt",
     "critical-section-single-hart",
 ]
 
@@ -57,4 +56,3 @@ version = "1.0.0"
 
 [lints.rust]
 nonstandard_style = "allow"
-
