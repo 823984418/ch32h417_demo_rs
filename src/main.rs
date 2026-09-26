@@ -30,8 +30,6 @@ use crate::interrupt::Interrupt;
 
 pub const DEVICE: Device = unsafe { core::mem::zeroed() };
 
-static RUNTIME_INITED: AtomicBool = AtomicBool::new(false);
-
 #[unsafe(export_name = "_mp_hook")]
 extern "C" fn mp_hook(hartid: usize) -> bool {
     hartid == 0
@@ -115,18 +113,15 @@ unsafe fn main() -> ! {
             .CTLR1
             .bit_set(device::usart::CTLR1::TXEIE, true);
 
-        RUNTIME_INITED.store(true, Ordering::SeqCst);
+        DEVICE.RCC.RSTSCKR.bit_set(device::rcc::RSTSCKR::RMVF, true);
 
-        println!("{:#?}", DEVICE.PFIC.WAKEIP);
         DEVICE.PFIC.WAKEIP[0].set(0);
         DEVICE.PFIC.WAKEIP[1].set(0);
         DEVICE.PFIC.SCTLR.bit_or(SCTLR::SETEVENT);
     } else {
-        riscv::asm::delay(1_000_000);
-        println!("RUNTIME_INITED = {}", RUNTIME_INITED.load(Ordering::SeqCst));
-        println!("cache_strtg_ctlr = {:#?}", DEVICE.CSR.cache_strtg_ctlr);
-        println!("{:#?}", DEVICE.PFIC.WAKEIP);
-        riscv::asm::delay(1_000_000);
+        if (DEVICE.RCC.RSTSCKR.get().bits() & 0xFE000000) != 0 {
+            DEVICE.PFIC.SystemReset();
+        }
     }
 
     match hart_id {
@@ -171,13 +166,14 @@ fn cpu1() -> ! {
             | CACHE_STRTG_CTLR::IC_SRAM_STRTG
             | CACHE_STRTG_CTLR::IC_CODE_STRTG,
     );
-
     DEVICE.PFIC.EnableIRQ(Interrupt::USART1_IRQHandler as usize);
 
     unsafe {
-        // riscv::interrupt::enable();
-        // riscv::asm::fence_i();
+        riscv::interrupt::enable();
+        riscv::asm::fence_i();
     }
+    println!("{:#?}", DEVICE.CSR);
+    println!("{:#?}", DEVICE.PFIC.CSTAR);
     let mut delay = delay::McycleDelay::new(400_000_000);
     delay.delay_ms(500);
 
