@@ -46,10 +46,12 @@ features = [
 version = "0.18.0"
 features = [
     "memory",
+    "custom-interrupts",
 ]
 
 [dependencies.rpb]
 path = "../rpb"
+features = ["ch32h417"]
 
 [dependencies.embedded-hal]
 version = "1.0.0"

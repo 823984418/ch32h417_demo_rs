@@ -20,3 +20,5 @@ REGION_ALIAS("REGION_HEAP", RAM);
 REGION_ALIAS("REGION_STACK", RAM);
 
 _max_hart_id = 1;
+
+INCLUDE interrupts.x
