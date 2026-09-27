@@ -6,7 +6,7 @@ target = [
 [target."cfg(all())"]
 rustflags = [
     "-Clink-arg=--nmagic",
-    "-Clink-arg=-Tlink.x",
+    "-Clink-arg=-Tch32h417_link.x",
 ]
 
 [unstable]

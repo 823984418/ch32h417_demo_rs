@@ -1,3 +1,4 @@
+#![feature(abi_riscv_interrupt)]
 #![no_main]
 
 pub mod delay;
@@ -9,7 +10,6 @@ const _: () = {
 };
 
 use core::mem::MaybeUninit;
-use core::sync::atomic::{AtomicBool, Ordering};
 
 use device::Device;
 use device::gpio::{CFGR_PIN, GPIO_Af, GPIO_Init, GPIO_Pin, GPIO_Pins, GPIO_Port, SPEED_PIN};
@@ -71,6 +71,10 @@ unsafe extern "C" fn write(
 unsafe fn main() -> ! {
     let hart_id = riscv::register::mhartid::read();
     if hart_id == 0 {
+        if (DEVICE.RCC.RSTSCKR.get().bits() & 0xFE000000) == 0 {
+            DEVICE.PFIC.SystemReset();
+        }
+
         unsafe { allocator_init() };
         DEVICE.RCC.DeInit();
         DEVICE.SetSYSCLK_400M_CoreCLK_V5F_400M_V3F_100M_HSE();
@@ -174,6 +178,7 @@ fn cpu1() -> ! {
     }
     println!("{:#?}", DEVICE.CSR);
     println!("{:#?}", DEVICE.PFIC.CSTAR);
+    println!("{:#?}", DEVICE.PFIC.IPSR);
     let mut delay = delay::McycleDelay::new(400_000_000);
     delay.delay_ms(500);
 
@@ -188,7 +193,7 @@ fn cpu1() -> ! {
     }
 }
 
-#[riscv_rt::core_interrupt(Interrupt::USART1_IRQHandler)]
-fn USART1_IRQHandler() {
+#[unsafe(export_name = "_start_USART1_IRQHandler_trap")]
+extern "riscv-interrupt-m" fn USART1_IRQHandler() {
     DEVICE.USART1.SendData(0x55);
 }

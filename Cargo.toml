@@ -8,9 +8,11 @@ name = "ch32h417_demo_rs"
 harness = false
 
 [profile.dev]
+codegen-units = 1
 debug = true
 
 [profile.release]
+codegen-units = 1
 debug = true
 
 [dependencies]
@@ -46,6 +48,7 @@ features = [
 version = "0.18.0"
 features = [
     "memory",
+    "v-trap",
     "custom-interrupts",
 ]
 
