@@ -1,2 +1,3 @@
 [toolchain]
-channel = "nightly-2026-07-28"
+# 阻塞于 https://github.com/rust-lang/rust/issues/164555
+channel = "nightly-2026-10-17"
